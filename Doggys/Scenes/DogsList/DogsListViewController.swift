@@ -11,14 +11,16 @@ import SwiftUI
 final class DogsListViewController: UIViewController {
     
     // MARK: - Subviews
-    private lazy var tableView: UITableView = {
-        let tableView: UITableView = .init(frame: .zero, style: .plain)
-        tableView.dataSource = self
-        tableView.allowsMultipleSelection = true
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: DogListCellView.identifier)
-        tableView.backgroundColor = .systemBackground
-        return tableView
+    private lazy var collectionView: UICollectionView = {
+        let collectionView: UICollectionView = .init(
+            frame: .zero,
+            collectionViewLayout: createCollectionViewLayout()
+        )
+        collectionView.dataSource = self
+        collectionView.allowsMultipleSelection = true
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: DogListCellView.identifier)
+        collectionView.backgroundColor = .systemBackground
+        return collectionView
     }()
     
     // MARK: - Private properties
@@ -42,7 +44,7 @@ final class DogsListViewController: UIViewController {
     // MARK: - Life cycle
     override func loadView() {
         super.loadView()
-        view = tableView
+        view = collectionView
     }
     
     override func viewDidLoad() {
@@ -85,29 +87,58 @@ private extension DogsListViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension DogsListViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
+// MARK: - UICollectionViewDataSource
+extension DogsListViewController: UICollectionViewDataSource {
+    func createCollectionViewLayout() -> UICollectionViewCompositionalLayout {
+        return .init { sectionIndex, _ in
+            let itemSize: NSCollectionLayoutSize = .init(
+                widthDimension: .fractionalWidth(0.5),
+                heightDimension: .fractionalHeight(1.0)
+            )
+            let item: NSCollectionLayoutItem = .init(layoutSize: itemSize)
+            
+            let groupSize: NSCollectionLayoutSize = .init(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .estimated(150)
+            )
+            let group: NSCollectionLayoutGroup = .horizontal(
+                layoutSize: groupSize,
+                subitems: [item]
+            )
+            group.interItemSpacing = .fixed(16)
+            
+            let section: NSCollectionLayoutSection = .init(group: group)
+            section.interGroupSpacing = 16
+            section.contentInsets = NSDirectionalEdgeInsets(
+                top: .zero,
+                leading: 16,
+                bottom: .zero,
+                trailing: 16
+            )
+            return section
+        }
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dogsList.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: UITableViewCell = tableView.dequeueReusableCell(
-            withIdentifier: DogListCellView.identifier,
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell: UICollectionViewCell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: DogListCellView.identifier,
             for: indexPath
         )
-        let dog: DogModel = dogsList[indexPath.row]
+        let dog: DogModel = dogsList[indexPath.item]
         
-        cell.separatorInset = tableView.layoutMargins
-        cell.selectionStyle = .none
         cell.configurationUpdateHandler = { [weak self] cell, state in
             cell.contentConfiguration = UIHostingConfiguration {
                 DogListCellView(dog: dog, isSelected: state.isSelected)
             }
+            .margins(.all, .zero)
             
             guard let self else { return }
             viewModel.updateDogSelectedState(at: indexPath.row, isSelected: state.isSelected)

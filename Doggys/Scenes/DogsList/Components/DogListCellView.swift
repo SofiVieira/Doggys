@@ -18,6 +18,19 @@ struct DogListCellView: View {
             static let size: CGSize = .init(width: 110, height: 100)
             static let cornerRadius: CGFloat = 16
         }
+        
+        enum SelectedImage {
+            static let padding: CGFloat = 2
+            static let unselectedOpacity: CGFloat = 0.2
+        }
+        
+        enum Animation {
+            static let duration: CGFloat = 0.2
+        }
+        
+        enum Border {
+            static let width: CGFloat = 1
+        }
     }
     
     // MARK: - Dependencies
@@ -32,36 +45,32 @@ struct DogListCellView: View {
     
     // MARK: - View Body
     var body: some View {
-        HStack(alignment: .center) {
-            HStack(alignment: .top) {
+        VStack {
+            ZStack(alignment: .bottomTrailing) {
                 Image(systemName: "dog.fill")
                     .resizable()
                     .background(Color(uiColor: .tertiaryLabel))
-                    .frame(
-                        width: LayoutConstants.Image.size.width,
-                        height: LayoutConstants.Image.size.height
-                    )
-                    .clipShape(borderShape)
-                    .overlay(
-                        borderShape
-                            .stroke(Color.black, lineWidth: 1)
-                    )
                 
-                Text(dog.name)
-                    .font(.body)
-                    .fontWeight(.black)
-                    .fontDesign(.rounded)
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title2)
+                    .symbolVariant(.fill)
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary.opacity(LayoutConstants.SelectedImage.unselectedOpacity))
+                    .contentTransition(.symbolEffect(.replace))
+                    .padding(LayoutConstants.SelectedImage.padding)
             }
             
-            Spacer()
-            
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.title)
-                .symbolVariant(.fill)
-                .foregroundStyle(isSelected ? Color.accentColor : Color.secondary.opacity(0.2))
-                .contentTransition(.symbolEffect(.replace))
+            Text(dog.name)
+                .font(.body)
+                .fontWeight(.black)
+                .fontDesign(.rounded)
         }
-        .animation(.snappy(duration: 0.2), value: isSelected)
+        .animation(.snappy(duration: LayoutConstants.Animation.duration), value: isSelected)
+        .frame(maxWidth: .infinity)
+        .clipShape(borderShape)
+        .overlay(
+            borderShape
+                .stroke(Color.black, lineWidth: LayoutConstants.Border.width)
+        )
     }
     
     // MARK: - Subviews
