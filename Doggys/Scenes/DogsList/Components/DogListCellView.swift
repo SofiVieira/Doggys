@@ -17,10 +17,11 @@ struct DogListCellView: View {
         enum Image {
             static let size: CGSize = .init(width: 110, height: 100)
             static let cornerRadius: CGFloat = 16
+            static let backgroundColorAlpha: CGFloat = 0.2
         }
         
         enum SelectedImage {
-            static let padding: CGFloat = 2
+            static let padding: CGFloat = 4
             static let unselectedOpacity: CGFloat = 0.2
         }
         
@@ -31,6 +32,8 @@ struct DogListCellView: View {
         enum Border {
             static let width: CGFloat = 1
         }
+        
+        static let verticalSpacing: CGFloat = 8
     }
     
     // MARK: - Dependencies
@@ -45,11 +48,9 @@ struct DogListCellView: View {
     
     // MARK: - View Body
     var body: some View {
-        VStack {
-            ZStack(alignment: .bottomTrailing) {
-                Image(systemName: "dog.fill")
-                    .resizable()
-                    .background(Color(uiColor: .tertiaryLabel))
+        VStack(spacing: LayoutConstants.verticalSpacing) {
+            ZStack(alignment: .topTrailing) {
+                dogImage
                 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
@@ -63,17 +64,31 @@ struct DogListCellView: View {
                 .font(.body)
                 .fontWeight(.black)
                 .fontDesign(.rounded)
+                .padding(.bottom, LayoutConstants.verticalSpacing)
         }
         .animation(.snappy(duration: LayoutConstants.Animation.duration), value: isSelected)
         .frame(maxWidth: .infinity)
         .clipShape(borderShape)
         .overlay(
             borderShape
-                .stroke(Color.black, lineWidth: LayoutConstants.Border.width)
+                .stroke(Color.secondary, lineWidth: LayoutConstants.Border.width)
         )
     }
     
     // MARK: - Subviews
+    private var dogImage: some View {
+        ZStack(alignment: .center) {
+            Color(hex: dog.colorHex)
+                .opacity(LayoutConstants.Image.backgroundColorAlpha)
+                .frame(maxWidth: .infinity)
+            
+            Image(dog.image)
+                .resizable()
+                .interpolation(.none)
+                .scaledToFit()
+        }
+    }
+    
     private var borderShape: some Shape {
         RoundedRectangle(
             cornerRadius: LayoutConstants.Image.cornerRadius
@@ -82,5 +97,12 @@ struct DogListCellView: View {
 }
 
 #Preview {
-    DogListCellView(dog: .init(name: "Teste"), isSelected: false)
+    DogListCellView(
+        dog: .init(
+            name: "Yorkshire",
+            image: "Yorkshire",
+            colorHex: UIColor.systemYellow.hexString
+        ),
+        isSelected: false
+    )
 }

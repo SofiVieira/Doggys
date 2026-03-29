@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 // MARK: - Input protocol
 protocol DogsListViewModelInput {
@@ -22,11 +23,12 @@ final class DogsListViewModel: DogsListViewModelInput {
     
     // MARK: - Private properties
     private let dogs: [DogModel] = [
-        .init(name: "Yorkshire"),
-        .init(name: "Samoieda"),
-        .init(name: "Cocker Spaniel"),
-        .init(name: "King Cavalier"),
-        .init(name: "Maltês"),
+        .init(name: "Yorkshire", image: "Yorkshire", colorHex: UIColor.systemYellow.hexString),
+        .init(name: "Samoieda", image: "Samoieda", colorHex: UIColor.systemGreen.hexString),
+        .init(name: "Cocker Spaniel", image: "CockerSpaniel", colorHex: UIColor.systemBlue.hexString),
+        .init(name: "King Cavalier", image: "KingCavalier", colorHex: UIColor.systemPurple.hexString),
+        .init(name: "Maltês", image: "Maltes", colorHex: UIColor.systemRed.hexString),
+        .init(name: "Shiba Inu", image: "ShibaInu", colorHex: UIColor.systemOrange.hexString),
     ]
     private var selectedDogs: [DogModel] = []
     
