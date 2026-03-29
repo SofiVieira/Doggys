@@ -12,7 +12,7 @@ import CoreData
 struct DogBreed: Identifiable {
     let id = UUID()
     let name: String
-    let icon: String
+    let icon: ImageResource
     let color: Color
 }
 
@@ -45,12 +45,12 @@ struct RouletteSector: Shape {
 struct BreedRouletteView: View {
     // Dados das raças
     let breeds = [
-        DogBreed(name: "Yorkshire", icon: "🦮", color: .yellow),
-        DogBreed(name: "Samoieda", icon: "🐕‍🦺", color: .green),
-        DogBreed(name: "Cocker Spaniel", icon: "🐕", color: .blue),
-        DogBreed(name: "King Cavalier", icon: "🦊", color: .purple),
-        DogBreed(name: "Maltês", icon: "🍞", color: .red),
-        DogBreed(name: "Shiba Inu", icon: "🦓", color: .orange)
+        DogBreed(name: "Yorkshire", icon: .yorkshire, color: .yellow),
+        DogBreed(name: "Samoieda", icon: .samoieda, color: .green),
+        DogBreed(name: "Cocker Spaniel", icon: .cockerSpaniel, color: .blue),
+        DogBreed(name: "King Cavalier", icon: .kingCavalier, color: .purple),
+        DogBreed(name: "Maltês", icon: .maltes, color: .red),
+        DogBreed(name: "Shiba Inu", icon: .shibaInu, color: .orange)
     ]
     
     @State private var rotation: Double = 0
@@ -69,7 +69,7 @@ struct BreedRouletteView: View {
             VStack(spacing: 60) {
                 // Legenda Elegante
                 VStack(spacing: 8) {
-                    Text("ESCOLHA SEU COMPANHEIRO")
+                    Text("SORTEIE SEU COMPANHEIRO")
                         .font(.caption.bold())
                         .tracking(3)
                         .foregroundColor(.secondary)
@@ -107,9 +107,10 @@ struct BreedRouletteView: View {
                             
                             // 4. Posiciona o Conteúdo (Emoji)
                             VStack {
-                                Text(breeds[index].icon)
-                                    .font(.system(size: 40))
-                                // Contra-rotaciona o emoji para ele ficar sempre "de pé"
+                                Image(breeds[index].icon)
+                                    .interpolation(.none)
+                                    .resizable()
+                                    .frame(maxWidth: 60, maxHeight: 60)
                                     .rotationEffect(.degrees(-(startAngle.degrees + (degreePerItem/2)) - rotation))
                                 Spacer()
                             }
