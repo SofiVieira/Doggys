@@ -1,46 +1,11 @@
 //
-//  DogBreed.swift
+//  BreedRouletteView.swift
 //  Doggys
 //
 //  Created by Sofia Vieira Rocha on 29/03/26.
 //
 
-
 import SwiftUI
-import CoreData
-
-struct DogBreed: Identifiable {
-    let id = UUID()
-    let name: String
-    let icon: ImageResource
-    let color: Color
-}
-
-struct RouletteSector: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
-        
-        // Move para o centro
-        path.move(to: center)
-        
-        // Adiciona o arco
-        path.addArc(center: center,
-                    radius: radius,
-                    startAngle: startAngle - .degrees(90), // Ajuste para o topo
-                    endAngle: endAngle - .degrees(90),
-                    clockwise: false)
-        
-        // Fecha de volta para o centro
-        path.closeSubpath()
-        
-        return path
-    }
-}
 
 struct BreedRouletteView: View {
     // Dados das raças
@@ -181,12 +146,6 @@ struct BreedRouletteView: View {
             // Feedback tátil ao passar por cada item
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
-    }
-}
-
-extension View {
-    func dropShadow() -> some View {
-        self.shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
     }
 }
 
