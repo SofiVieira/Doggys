@@ -30,7 +30,7 @@ struct ButtonView: View {
                     .foregroundColor(.white)
             }
         })
-        .frame(width: .infinity, height: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(8)
     }
 }
