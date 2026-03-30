@@ -22,7 +22,7 @@ struct ButtonView: View {
                     .resizable()
                     .interpolation(.none)
                     .scaledToFit()
-                    .opacity(0.9)
+                    .opacity(0.8)
                     
                 Text(text)
                     .bold()
