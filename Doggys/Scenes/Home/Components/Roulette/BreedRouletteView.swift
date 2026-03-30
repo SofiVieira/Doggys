@@ -8,27 +8,31 @@
 import SwiftUI
 
 struct BreedRouletteView: View {
-
-    let breeds = [
-        DogBreed(name: "Yorkshire", icon: .yorkshire, color: .yellow),
-        DogBreed(name: "Samoieda", icon: .samoieda, color: .green),
-        DogBreed(name: "Cocker Spaniel", icon: .cockerSpaniel, color: .blue),
-        DogBreed(name: "King Cavalier", icon: .kingCavalier, color: .purple),
-        DogBreed(name: "Maltês", icon: .maltes, color: .red),
-        DogBreed(name: "Shiba Inu", icon: .shibaInu, color: .orange)
-    ]
     
-    var degreePerItem: Double {
-            360.0 / Double(breeds.count)
-        }
-    
+    // MARK: - Private State properties
     @State private var rotation: Double = 0
     @State private var lastRotation: Double = 0
     @State private var selectedIndex: Int = 0
     @State private var dragVelocity: Double = 0
     @State private var lastDragValue: DragGesture.Value?
-    
+    @State private var showAddSheet: Bool = false
     private let impactMed = UIImpactFeedbackGenerator(style: .medium)
+    
+    // MARK: - Computed properties
+    private var degreePerItem: Double {
+        if dogs.isEmpty {
+            return 360
+        }
+        
+        return 360.0 / Double(dogs.count)
+    }
+    
+    // MARK: - Dependencies
+    let dogs: [DogModel]
+    
+    init(dogs: [DogModel]) {
+        self.dogs = dogs
+    }
     
     var body: some View {
         ZStack {
@@ -41,7 +45,7 @@ struct BreedRouletteView: View {
                         .tracking(3)
                         .foregroundColor(.secondary)
                     
-                    Text(breeds[selectedIndex].name)
+                    Text(dogs.isEmpty ? "Gire" : dogs[selectedIndex].name)
                         .font(.system(size: 34, weight: .black, design: .rounded))
                         .contentTransition(.interpolate)
                 }
@@ -50,15 +54,15 @@ struct BreedRouletteView: View {
                 ZStack(alignment: .top) {
                     ZStack {
                         Circle()
-                            .fill(Color(uiColor: .systemBackground))
+                            .fill(Color.secondary.opacity(0.2))
                             .shadow(color: .black.opacity(0.1), radius: 25, x: 0, y: 15)
                         
-                        ForEach(0..<breeds.count, id: \.self) { index in
-                            let startAngle = Angle(degrees: degreePerItem * Double(index))
-                            let endAngle = Angle(degrees: degreePerItem * Double(index + 1))
+                        ForEach(0..<dogs.count, id: \.self) { index in
+                            let startAngle: Angle = Angle(degrees: degreePerItem * Double(index))
+                            let endAngle: Angle = Angle(degrees: degreePerItem * Double(index + 1))
                             
                             RouletteSector(startAngle: startAngle, endAngle: endAngle)
-                                .fill(breeds[index].color.opacity(0.2))
+                                .fill(Color(hex: dogs[index].colorHex).opacity(0.2))
                                 .overlay(
                                     RouletteSector(startAngle: startAngle, endAngle: endAngle)
                                         .stroke(Color.primary.opacity(0.05), lineWidth: 0.5)
@@ -66,7 +70,7 @@ struct BreedRouletteView: View {
                                 .zIndex(0)
                             
                             VStack {
-                                Image(breeds[index].icon)
+                                Image(dogs[index].image)
                                     .interpolation(.none)
                                     .resizable()
                                     .scaledToFit()
@@ -90,17 +94,19 @@ struct BreedRouletteView: View {
                     .gesture(
                         DragGesture()
                             .onChanged { value in
+                                guard !dogs.isEmpty else { return }
                                 let translation = value.translation.width
                                 rotation = lastRotation + translation
                                 updateSelection()
                             }
                             .onEnded { value in
+                                guard !dogs.isEmpty else { return }
                                 let velocity = value.predictedEndTranslation.width
                                 
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0)) {
                                     rotation += velocity / 2
                                     
-                                    let degreePerItem = 360 / Double(breeds.count)
+                                    let degreePerItem = 360 / Double(dogs.count)
                                     rotation = (rotation / degreePerItem).rounded() * degreePerItem
                                     
                                     lastRotation = rotation
@@ -120,18 +126,26 @@ struct BreedRouletteView: View {
                 }
                 
                 Spacer()
+                
+                ButtonView(text: "Adicionar opções", color: .accentColor) {
+                    showAddSheet = true
+                }
             }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            DogsListView()
         }
     }
     
     private func updateSelection() {
-        let degreePerItem = 360 / Double(breeds.count)
+        guard !dogs.isEmpty else { return }
+        let degreePerItem = 360 / Double(dogs.count)
         
         let normalizedRotation = (rotation.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
         
         let index = Int((360 - normalizedRotation).truncatingRemainder(dividingBy: 360) / degreePerItem)
         
-        if index >= 0 && index < breeds.count && index != selectedIndex {
+        if index >= 0 && index < dogs.count && index != selectedIndex {
             selectedIndex = index
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
@@ -139,5 +153,5 @@ struct BreedRouletteView: View {
 }
 
 #Preview {
-    BreedRouletteView()
+    BreedRouletteView(dogs: [])
 }

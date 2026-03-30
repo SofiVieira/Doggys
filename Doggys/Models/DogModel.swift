@@ -5,14 +5,16 @@
 //  Created by Yuri Strack on 29/03/26.
 //
 
-import Foundation
+import SwiftData
 
-struct DogModel: Equatable {
+@Model
+class DogModel {
     
     /// Dog Breed name
-    let name: String
-    let image: String
-    let colorHex: String
+    @Attribute(.unique)
+    var name: String
+    var image: String
+    var colorHex: String
     
     init(name: String, image: String, colorHex: String) {
         self.name = name

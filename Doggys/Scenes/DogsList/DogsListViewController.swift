@@ -35,6 +35,8 @@ final class DogsListViewController: UIViewController {
     init(viewModel: DogsListViewModelInput) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        
+        viewModel.setOutput(self)
     }
     
     required init?(coder: NSCoder) {
@@ -49,6 +51,7 @@ final class DogsListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel.fetchSelectedDogs()
         self.title = viewModel.getViewTitle()
         setNavigationBarItens()
     }
@@ -79,6 +82,7 @@ private extension DogsListViewController {
     }
     
     @objc func doneButtonTapped() {
+        viewModel.persistSelectedDogs()
         self.dismiss(animated: true)
     }
     
@@ -145,5 +149,14 @@ extension DogsListViewController: UICollectionViewDataSource {
             updateDoneButtonEnabledState()
         }
         return cell
+    }
+}
+
+// MARK: - DogsListViewModelOutput
+extension DogsListViewController: DogsListViewModelOutput {
+    func setSelectedCells(indexPaths: [IndexPath]) {
+        indexPaths.forEach { indexPath in
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+        }
     }
 }

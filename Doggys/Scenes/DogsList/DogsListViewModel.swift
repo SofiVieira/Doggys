@@ -7,15 +7,25 @@
 
 import Foundation
 import UIKit
+import SwiftData
 
 // MARK: - Input protocol
 protocol DogsListViewModelInput {
+    func setOutput(_ output: DogsListViewModelOutput?)
+    
     func getViewTitle() -> String?
     func getDoneButtonTitle() -> String
     func isDoneButtonEnabled() -> Bool
     
     func getDogsList() -> [DogModel]
+    func fetchSelectedDogs()
     func updateDogSelectedState(at row: Int, isSelected: Bool)
+    func persistSelectedDogs()
+}
+
+// MARK: - Output protocol {
+protocol DogsListViewModelOutput: AnyObject {
+    func setSelectedCells(indexPaths: [IndexPath])
 }
 
 // MARK: - Concrete implementation
@@ -31,16 +41,23 @@ final class DogsListViewModel: DogsListViewModelInput {
         .init(name: "Shiba Inu", image: "ShibaInu", colorHex: UIColor.systemOrange.hexString),
     ]
     private var selectedDogs: [DogModel] = []
+    private weak var output: DogsListViewModelOutput?
     
     // MARK: - Dependencies
     private let title: String?
+    private let modelContext: ModelContext
     
     // MARK: - Intializer
-    init(title: String? = nil) {
+    init(title: String? = nil, modelContext: ModelContext) {
         self.title = title
+        self.modelContext = modelContext
     }
     
     // MARK: - Public methods
+    func setOutput(_ output: DogsListViewModelOutput?) {
+        self.output = output
+    }
+    
     func getViewTitle() -> String? {
         return title
     }
@@ -57,6 +74,19 @@ final class DogsListViewModel: DogsListViewModelInput {
         return dogs
     }
     
+    func fetchSelectedDogs() {
+        let descriptor: FetchDescriptor<DogModel> = .init()
+        let _selectedDogs: [DogModel]? = try? modelContext.fetch(descriptor)
+        self.selectedDogs = _selectedDogs ?? []
+        
+        var indexPathsToUpdate: [IndexPath] = []
+        for index in 0..<dogs.count {
+            guard selectedDogs.contains(where: { $0.name == dogs[index].name }) else { continue }
+            indexPathsToUpdate.append(.init(item: index, section: 0))
+        }
+        output?.setSelectedCells(indexPaths: indexPathsToUpdate)
+    }
+    
     func updateDogSelectedState(at row: Int, isSelected: Bool) {
         if isSelected {
             didSelectDog(at: row)
@@ -64,6 +94,16 @@ final class DogsListViewModel: DogsListViewModelInput {
         }
         
         didDeselectDog(at: row)
+    }
+    
+    func persistSelectedDogs() {
+        try? modelContext.delete(model: DogModel.self)
+        
+        selectedDogs.forEach { dog in
+            modelContext.insert(dog)
+        }
+        
+        try? modelContext.save()
     }
 }
 

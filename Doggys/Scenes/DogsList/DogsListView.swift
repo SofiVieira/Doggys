@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DogsListView: UIViewControllerRepresentable {
     
+    @Environment(\.modelContext) private var modelContext
+    
     // MARK: - Dependencies
     private let title: String?
     
@@ -21,7 +23,7 @@ struct DogsListView: UIViewControllerRepresentable {
     
     // MARK: - UIViewControllerRepresentable methods
     func makeUIViewController(context: Context) -> DogsListNavigationController {
-        let dogsListViewModel: DogsListViewModel = .init(title: title)
+        let dogsListViewModel: DogsListViewModel = .init(title: title, modelContext: modelContext)
         let dogsListViewController: DogsListViewController = .init(viewModel: dogsListViewModel)
         return DogsListNavigationController(viewController: dogsListViewController)
     }

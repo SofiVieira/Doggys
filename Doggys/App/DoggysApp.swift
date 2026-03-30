@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct DoggysApp: App {
@@ -13,5 +14,6 @@ struct DoggysApp: App {
         WindowGroup {
             HomeView()
         }
+        .modelContainer(for: DogModel.self)
     }
 }

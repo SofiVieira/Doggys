@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
+    
+    @Query var selectedDogs: [DogModel]
+    
     var body: some View {
         VStack {
-            BreedRouletteView()
+            BreedRouletteView(dogs: selectedDogs)
         }
         .padding()
     }
