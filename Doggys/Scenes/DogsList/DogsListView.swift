@@ -40,3 +40,7 @@ final class DogsListNavigationController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#Preview {
+    DogsListView()
+}

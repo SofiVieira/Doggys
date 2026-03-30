@@ -22,7 +22,7 @@ struct ButtonView: View {
                 .frame(maxWidth: .infinity, maxHeight: 44)
         })
         .buttonStyle(.borderedProminent)
-        .tint(color)
+        .tint(Color(color).opacity(0.9))
     }
 }
 
