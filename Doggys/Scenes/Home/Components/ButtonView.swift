@@ -10,26 +10,35 @@ import SwiftUI
 struct ButtonView: View {
     
     var text: String
-    var color: Color
+    var color: ImageResource
     var action: () -> Void
     
     var body: some View {
         Button(action: {
             action()
         }, label: {
-            Text(text)
-                .bold()
-                .frame(maxWidth: .infinity, maxHeight: 44)
+            ZStack {
+                Image(color)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .opacity(0.9)
+                    
+                Text(text)
+                    .bold()
+                    .frame(maxWidth: .infinity, maxHeight: 44)
+                    .foregroundColor(.white)
+            }
         })
-        .buttonStyle(.borderedProminent)
-        .tint(Color(color).opacity(0.9))
+        .frame(width: .infinity, height: .infinity)
+        .padding(8)
     }
 }
 
 #Preview {
     HStack {
-        ButtonView(text: "Delete", color: .red, action: {})
-        ButtonView(text: "Continue", color: .green, action: {})
+        ButtonView(text: "Delete", color: .redBone, action: {})
+        ButtonView(text: "Continue", color: .greenBone, action: {})
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
 }

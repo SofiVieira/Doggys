@@ -127,7 +127,7 @@ struct BreedRouletteView: View {
                 
                 Spacer()
                 
-                ButtonView(text: "Adicionar opções", color: .accentColor) {
+                ButtonView(text: "Adicionar opções", color: .blueBone) {
                     showAddSheet = true
                 }
             }
